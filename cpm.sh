@@ -1,40 +1,103 @@
 cat > $PREFIX/bin/cpm << 'SCRIPT'
 #!/bin/bash
 # =============================================
-# JOZETH TOOLS CPM  - JOZETH DEV
-# github.com/JOZETH-DEV/jozeth-dev-tools
+# JOZETH TOOLS v5.0 - NEON EDITION
+# CPM1 | CPM2 | TRAFFIC RACER | NEXTGEN TRUCK
 # =============================================
-
-# === COLORES NEÓN ===
-RED='\033[1;31m'       # Rojo neón principal
-BRED='\033[38;5;196m'  # Rojo brillante
-DARKB='\033[38;5;17m'  # Azul oscuro (fondo simulado)
-BLUE='\033[38;5;27m'   # Azul gradiente
-LBLUE='\033[38;5;39m'  # Azul claro gradiente
-WHT='\033[1;37m'       # Blanco
-GRY='\033[38;5;245m'   # Gris
-GRN='\033[1;32m'       # Verde (éxito)
-YEL='\033[1;33m'       # Amarillo (advertencia)
-N='\033[0m'            # Reset
+R='\033[1;31m'; G='\033[1;32m'; Y='\033[1;33m'; B='\033[1;34m'
+M='\033[1;35m'; C='\033[1;36m'; W='\033[1;37m'; N='\033[0m'
 
 API="https://bot-api.devwebasmodeo.workers.dev/api"
 CHECK="https://bot-api.devwebasmodeo.workers.dev/validate"
 
-# === NIVEL → RANGO ===
-get_rank() {
-  case $1 in
-    1) echo "BEGINNER" ;;
-    2) echo "DRIVER"   ;;
-    3) echo "RACER"    ;;
-    4) echo "PRO"      ;;
-    5) echo "EXPERT"   ;;
-    6) echo "KING"     ;;
-    *) echo "SIN RANGO";;
-  esac
-}
+sep() { echo -e "\033[38;5;17m━━\033[38;5;19m━━\033[38;5;27m━━\033[38;5;39m━━\033[38;5;160m━━\033[38;5;196m━━\033[38;5;160m━━\033[38;5;39m━━\033[38;5;27m━━\033[38;5;19m━━\033[38;5;17m━━${N}"; }
+spin() { local s=('◐' '◓' '◑' '◒'); for i in {1..12}; do echo -ne "\r  ${R}${s[$((i%4))]}${N} ${W}Procesando...${N}"; sleep 0.1; done; echo -e "\r  ${G}✔${N} ${W}Completado${N}    "; }
+read_i() { echo -ne "  ${R}▸${N} ${W}${1}${N} "; [ "$3" = "s" ] && read -s $2 || read $2; echo -ne "$N"; [ "$3" = "s" ] && echo ""; }
 
-# === SEPARADOR GRADIENTE AZUL→ROJO ===
-sep() {
+clear
+echo -e "${R}╔══════════════════════════════════════════╗"
+echo -e "${R}║${W}  JOZETH TOOLS v5.0 - NEON EDITION      ${R}║"
+echo -e "${R}║${G}  CPM1 | CPM2 | Traffic | Truck         ${R}║"
+echo -e "${R}╚══════════════════════════════════════════╝${N}"
+sep; echo ""; read_i "🔑 Key:" KEY; echo ""; spin
+RESP=$(curl -s "$CHECK?key=$KEY"); VALID=$(echo "$RESP" | python3 -c "import sys,json;print(json.load(sys.stdin).get('valid'))" 2>/dev/null)
+[ "$VALID" != "True" ] && { echo -e "  ${R}✘ ACCESO DENEGADO${N}"; exit 1; }
+echo -e "  ${G}✔ Acceso Concedido${N}"; sleep 1; clear
+
+echo -e "${R}╔══════════════════════════════════════════╗"
+echo -e "${R}║${W}  🔐 INICIAR SESIÓN                     ${R}║"
+echo -e "${R}╚══════════════════════════════════════════╝${N}"
+echo -e "  ${B}[1]${W} 🚗 CPM1  ${B}[2]${W} 🚗 CPM2  ${B}[3]${W} 🏎️ Traffic  ${B}[4]${W} 🚛 Truck${N}"
+read_i "▶ Juego:" GAME
+case $GAME in 
+  1) GNAME="CPM1";;
+  2) GNAME="CPM2";;
+  3) GNAME="TRAFFIC RACER";;
+  4) GNAME="NEXTGEN TRUCK";;
+  *) exit 1;;
+esac
+read_i "📧 Email:" EMAIL; read_i "🔒 Pass:" PASSWORD s; spin
+LOGIN=$(curl -s -X POST "$API" -H "Content-Type: application/json" -d "{\"action\":\"login\",\"game\":\"$GAME\",\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}")
+TOKEN=$(echo "$LOGIN" | python3 -c "import sys,json;print(json.load(sys.stdin).get('idToken',''))" 2>/dev/null)
+[ -z "$TOKEN" ] && { echo -e "  ${R}✘ Error${N}"; exit 1; }
+echo -e "  ${G}✔ OK${N}"; sleep 1
+
+while true; do
+  clear
+  echo -e "${R}╔══════════════════════════════════════════╗"
+  echo -e "${R}║${W}  ${GNAME} - ${EMAIL}${N}"
+  echo -e "${R}╠══════════════════════════════════════════╣"
+  
+  case $GAME in
+    1) # CPM1
+      echo -e "${R}║${N} ${B}[1]${W} 👑 King  ${B}[2]${W} 📊 Stats  ${B}[3]${W} 🎁 Rew  ${B}[4]${W} 📋 Task${R}║${N}"
+      ;;
+    2) # CPM2
+      echo -e "${R}║${N} ${B}[1]${W} 📧 Email  ${B}[2]${W} 🔒 Pass  ${B}[3]${W} 🆕 New${R}║${N}"
+      ;;
+    3) # Traffic Racer
+      echo -e "${R}║${N} ${B}[1]${W} 💰 \$${N}  ${B}[2]${W} 🔥Boost${N}  ${B}[3]${W} 📊Lvl${N}  ${B}[4]${W} 🔧Tune${R}║${N}"
+      echo -e "${R}║${N} ${B}[5]${W} 🚀FULL${N}  ${B}[6]${W} 📖Ver${R}║${N}"
+      ;;
+    4) # Nextgen Truck
+      echo -e "${R}║${N} ${B}[1]${W} 💰 Gold+Coins  ${B}[2]${W} 📊 Nivel 100${R}║${N}"
+      echo -e "${R}║${N} ${B}[3]${W} 🚛 Todos Autos  ${B}[4]${W} 🚀 FULL${R}║${N}"
+      ;;
+  esac
+  
+  echo -e "${R}║${N} ${B}[7]${W} 📧 Email  ${B}[8]${W} 🔒 Pass  ${B}[9]${W} 🆕 New  ${B}[0]${W} 🚪 Exit${R}║${N}"
+  echo -e "${R}╚══════════════════════════════════════════╝${N}"
+  read_i "▶ Opción:" OPT
+
+  case $OPT in
+    # ============ CPM1 ============
+    1) [ "$GAME" = "1" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"king\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ King${N}"; read -p "Enter..."; }
+       [ "$GAME" = "3" ] && { read_i "💰 Dollars:" D; read_i "🪙 Gold:" G; spin; curl -s -X POST "$API" -d "{\"action\":\"traffic_main\",\"token\":\"$TOKEN\",\"dollars\":$D,\"gold\":$G}" > /dev/null; echo -e "${G}✔ \$${D}+${G}G${N}"; read -p "Enter..."; }
+       [ "$GAME" = "4" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"truck_money\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ Gold:999K Coins:999M${N}"; read -p "Enter..."; }
+       ;;
+    2) [ "$GAME" = "1" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"status\",\"token\":\"$TOKEN\"}" | python3 -c "import sys,json;d=json.load(sys.stdin);r=json.loads(d.get('result','{}'));l=r.get('level',0);print(f'🏆 Nivel:{l} | 👑 King:{\"SI\" if l>=6 else \"NO\"}')"; read -p "Enter..."; }
+       [ "$GAME" = "3" ] && { read_i "🔥 Boosters:" B; spin; curl -s -X POST "$API" -d "{\"action\":\"traffic_boosters\",\"token\":\"$TOKEN\",\"boosters\":$B}" > /dev/null; echo -e "${G}✔ x${B}${N}"; read -p "Enter..."; }
+       [ "$GAME" = "4" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"truck_level\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ Nivel 100 + Trabajos MAX${N}"; read -p "Enter..."; }
+       ;;
+    3) [ "$GAME" = "1" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"rewards\",\"token\":\"$TOKEN\"}" | python3 -c "import sys,json;d=json.load(sys.stdin);r=json.loads(d.get('result','[]'));[print(f'D{i+1}: {\"✅\" if x.get(\"status\")==1 else \"⬜\"} \${x.get(\"cash\",0)}') for i,x in enumerate(r)]"; read -p "Enter..."; }
+       [ "$GAME" = "3" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"traffic_level\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ Nivel 50${N}"; read -p "Enter..."; }
+       [ "$GAME" = "4" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"truck_vehicles\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ 85 vehículos${N}"; read -p "Enter..."; }
+       ;;
+    4) [ "$GAME" = "1" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"tasks\",\"token\":\"$TOKEN\"}" | python3 -c "import sys,json;d=json.load(sys.stdin);r=json.loads(d.get('result','{}'));[print(f'{t.get(\"name\")}: {t.get(\"current\")}/{t.get(\"goal\")}') for t in r.get('tasks',[])]"; read -p "Enter..."; }
+       [ "$GAME" = "3" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"traffic_tuning\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ Tuning 10${N}"; read -p "Enter..."; }
+       [ "$GAME" = "4" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"truck_full\",\"token\":\"$TOKEN\"}" > /dev/null; echo -e "${G}✔ FULL COMPLETO${N}"; read -p "Enter..."; }
+       ;;
+    5) [ "$GAME" = "3" ] && { read_i "💰 Dollars:" D; read_i "🪙 Gold:" G; read_i "🔥 Boosters:" B; spin; curl -s -X POST "$API" -d "{\"action\":\"traffic_full\",\"token\":\"$TOKEN\",\"dollars\":$D,\"gold\":$G,\"boosters\":$B}" > /dev/null; echo -e "${G}✔ FULL${N}"; read -p "Enter..."; } ;;
+    6) [ "$GAME" = "3" ] && { spin; curl -s -X POST "$API" -d "{\"action\":\"traffic_status\",\"token\":\"$TOKEN\"}" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('message','OK'))"; read -p "Enter..."; } ;;
+    7) { read_i "📧 Nuevo Email:" NE; spin; R=$(curl -s -X POST "$API" -d "{\"action\":\"change_email\",\"token\":\"$TOKEN\",\"newEmail\":\"$NE\",\"password\":\"$PASSWORD\",\"game\":\"$GAME\"}"); NT=$(echo "$R" | python3 -c "import sys,json;print(json.load(sys.stdin).get('idToken',''))"); [ -n "$NT" ] && { TOKEN="$NT"; EMAIL="$NE"; echo -e "${G}✔${N}"; } || echo -e "${R}✘${N}"; read -p "Enter..."; } ;;
+    8) { read_i "🔒 Nueva Pass:" NP s; spin; R=$(curl -s -X POST "$API" -d "{\"action\":\"change_password\",\"token\":\"$TOKEN\",\"newPass\":\"$NP\",\"email\":\"$EMAIL\",\"game\":\"$GAME\"}"); NT=$(echo "$R" | python3 -c "import sys,json;print(json.load(sys.stdin).get('idToken',''))"); [ -n "$NT" ] && { TOKEN="$NT"; PASSWORD="$NP"; echo -e "${G}✔${N}"; } || echo -e "${R}✘${N}"; read -p "Enter..."; } ;;
+    9) { read_i "📧 Email:" NE; read_i "🔒 Pass:" NP s; spin; R=$(curl -s -X POST "$API" -d "{\"action\":\"signup\",\"game\":\"$GAME\",\"email\":\"$NE\",\"password\":\"$NP\"}"); NT=$(echo "$R" | python3 -c "import sys,json;print(json.load(sys.stdin).get('idToken',''))"); [ -n "$NT" ] && { TOKEN="$NT"; EMAIL="$NE"; PASSWORD="$NP"; echo -e "${G}✔ Creada${N}"; } || echo -e "${R}✘${N}"; read -p "Enter..."; } ;;
+    0) echo -e "${R}👋${N}"; exit 0 ;;
+  esac
+done
+SCRIPT
+
+chmod +x $PREFIX/bin/cpmsep() {
   echo -e "  \033[38;5;17m━━\033[38;5;18m━━\033[38;5;19m━━\033[38;5;20m━━\033[38;5;27m━━\033[38;5;33m━━\033[38;5;39m━━\033[38;5;160m━━\033[38;5;196m━━\033[38;5;197m━━\033[38;5;203m━━\033[38;5;196m━━\033[38;5;39m━━\033[38;5;33m━━\033[38;5;27m━━\033[38;5;20m━━\033[38;5;19m━━\033[38;5;18m━━\033[38;5;17m━━${N}"
 }
 
